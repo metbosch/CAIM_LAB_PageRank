@@ -1,4 +1,4 @@
-PageRank Laboratoy of CAIM FIB UPC
+Airports PageRank
 =================
 
 PageRank algorithm implementation for CAIM Subject (FIB - UPC)
