@@ -61,7 +61,34 @@ public class PageRank {
 
 
    public static void readRoutes() {
-      ...
+      try {
+         String fileName = "routes.txt";
+         System.out.println("... opening file "+fileName);
+         FileInputStream fstream = new FileInputStream(fileName);
+         DataInputStream in = new DataInputStream(fstream);
+         BufferedReader br = new BufferedReader(new InputStreamReader(in));
+         
+         String strLine;
+         int index = 0;
+         while ((strLine = br.readLine()) != null) {           
+               String[] aLine = strLine.split(",");
+               String fromAirport = aLine[2];
+               String toAirport = aLine[4];
+
+               //A lot of things to do
+         }
+
+         // TO DO: DUMP STUFF TO airportCodes, airportNames, airportIndices
+         
+         System.out.println("... "+index+" routes read");
+
+         in.close();
+         
+       } catch (Exception e){
+         //Catch exception if any
+             System.err.println("Error: " + e.getMessage());
+             // return null;
+       }
    }
 
    public static computePageRanks() {
