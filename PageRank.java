@@ -37,9 +37,10 @@ public class PageRank {
                String[] aLine = strLine.split(",");
                String airportCode = aLine[4];
                String airportName = aLine[1]+" ("+aLine[3]+")";
-               if (airportCode.length() > 0) {
+               if (airportCode.length() > 2) {
                    codeTemp.add(airportCode);
                    nameTemp.add(airportName);
+                   airportIndices.put(airportCode,index); //MARC
                    index++;
                 }
          }
