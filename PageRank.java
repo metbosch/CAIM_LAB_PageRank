@@ -43,8 +43,17 @@ public class PageRank {
                    airportIndices.put(airportCode,index); //MARC
                    index++;
                 }
-         }
 
+         }
+         
+         airportCodes[] = new String[index];
+         airportNames[] = new String[index];
+         G[] = new EdgeList[index];
+         
+         for (int i = 0; i < index; i++) {
+            airportCodes[i] = codeTemp.get(i);
+            airportNames[] = nameTemp.get(i);
+         }
          // TO DO: DUMP STUFF TO airportCodes, airportNames, airportIndices
          
          System.out.println("... "+index+" airports read");
