@@ -160,16 +160,27 @@ public class PageRank {
         return iters;
     }
 
-    public static void outputPageRanks() {
-       //...
+    public static void outputPageRanks(Boolean sort, int limit) {
+        if (sort) {
+            java.util.Arrays.sort(ranks);
+        }
+        for (int i = 0; i < ranks.length && (i < limit || limit < 0); ++i) {
+            System.out.print(airportNames[i].substring(0, Math.min(66, airportNames[i].length())));
+            for (int j = airportNames[i].length(); j < 65; ++j) System.out.print(" ");
+            System.out.println(" " + ranks[i] + "\t" + airportCodes[i] + "\t" + G[i].weight);
+        }
     }
 
     /**
       * Print usage info for this program
       */
     public static void usage() {
-        System.out.println("Allowed parameters: maxIters, lambda, precision");
-        System.out.println("If some parameter don't existes, default values will be used");
+        System.out.println("Allowed parameters (indicated value is the default):");
+        System.out.println("   maxIters:  [1000000] Limit of iterations number");
+        System.out.println("   lambda:    [0.85]    Lambda value for pageRank equation");
+        System.out.println("   precision: [0.001]   Maximum avarage change untill stop");
+        System.out.println("   sort:      [false]   Sort the results after print it");
+        System.out.println("   results:   [-1]      Number of results to print (-1 = all)");
         System.out.println("Example: java PageRank maxIters 10000 lambda 0.9");
         System.exit(0);
     }
@@ -188,22 +199,32 @@ public class PageRank {
 
        HashMap<String, Double> ret = new HashMap<String, Double>();
        for (int i = 0; i < args.length; i += 2) {
-           ret.put(args[i], Double.parseDouble(args[i + 1]));
+           Double val;
+           if (args[i + 1].toLowerCase().equals("true")) {
+               val = 1.0;
+           } else if (args[i + 1].toLowerCase().equals("false")) {
+               val = 0.0;
+           } else {
+               val = Double.parseDouble(args[i + 1]);
+           }
+           ret.put(args[i], val);
        }
        return ret;
     }
 
     public static void main(String args[])  {
 
-        HashMap<String, Double> params = getParams(args, 3);
+        HashMap<String, Double> params = getParams(args, 5);
         if (params.get("maxIters") == null) params.put("maxIters", 1000000.0);
         if (params.get("lambda") == null) params.put("lambda", 0.85);
         if (params.get("precision") == null) params.put("precision", 0.001);
+        if (params.get("sort") == null) params.put("sort", 0.0);
+        if (params.get("results") == null) params.put("results", -1.0);
 
         readAirports();   // get airport names, codes, and assign indices
         readRoutes();     // read tuples and build graph
         computePageRanks(params.get("lambda"), params.get("precision"), params.get("maxIters").intValue());
-        outputPageRanks();
+        outputPageRanks(params.get("sort").equals(1.0), params.get("results").intValue());
 
     }
 
