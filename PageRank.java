@@ -138,22 +138,35 @@ public class PageRank {
         double change;
         int iters;
 
+
         System.out.println("Starting pageRank calculation");
         for (iters = 0; iters < maxIters; ++iters) {
             change = 0.0;
+            double pr_extra = 0.0;
+            double pr_end = 0.0;
             for (int i = 0; i < ranks.length; ++i) {
                 double newRank = 0.0;
+
                 for (int j = 0; j < G[i].list.size(); ++j) {
+
+
                     Edge inEdge = G[i].list.get(j);
                     // (Rank of J) * (Edges from J to I) / (Outgoing edges of J)
                     newRank += ranks[inEdge.origin] * ((double)(inEdge.weight)) /
                                                       ((double)(G[inEdge.origin].weight));
                 }
+                newRank += pr_end;
                 newRank = (1 - lambda) + lambda*newRank;
                 change += Math.abs(ranks[i] - newRank);
                 ranks[i] = newRank;
+                if (G[i].weight == 0) {
+                    double pr = ranks[i] / ranks.length;
+                    ranks[i] = 0.0;
+                    pr_extra += pr;
+                }
             }
             if (change < maxChange) break;
+            pr_end = pr_extra;
         }
         System.out.println("Finished pageRank calculation after " + iters + " iterations");
 
@@ -167,7 +180,7 @@ public class PageRank {
         for (int i = 0; i < ranks.length && (i < limit || limit < 0); ++i) {
             System.out.print(airportNames[i].substring(0, Math.min(66, airportNames[i].length())));
             for (int j = airportNames[i].length(); j < 65; ++j) System.out.print(" ");
-            System.out.println(" " + ranks[i] + "\t" + airportCodes[i] + "\t" + G[i].weight);
+            System.out.println(" " + ranks[i] + "\t" + airportCodes[i] + "\t" + G[i].weight + "G[i].list.size =" + G[i].list.size());
         }
     }
 
