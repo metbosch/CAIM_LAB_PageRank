@@ -134,38 +134,35 @@ public class PageRank {
       * @return Nuber of done iterations
       */
     public static int computePageRanks(final double lambda, final double stoper, final int maxIters) {
-        final double maxChange = stoper * ranks.length;
-        double change;
+        double pr_end = 0.0;
         int iters;
 
-
         System.out.println("Starting pageRank calculation");
+        System.out.print("Iters: 0\r");
         for (iters = 0; iters < maxIters; ++iters) {
-            change = 0.0;
+            int change = 0;
             double pr_extra = 0.0;
-            double pr_end = 0.0;
+            // For each node
             for (int i = 0; i < ranks.length; ++i) {
                 double newRank = 0.0;
-
+                // For each incoming edge
                 for (int j = 0; j < G[i].list.size(); ++j) {
-
-
                     Edge inEdge = G[i].list.get(j);
                     // (Rank of J) * (Edges from J to I) / (Outgoing edges of J)
                     newRank += ranks[inEdge.origin] * ((double)(inEdge.weight)) /
                                                       ((double)(G[inEdge.origin].weight));
                 }
-                newRank += pr_end;
+                newRank += (G[i].weight == 0) ? 0 : pr_end;
                 newRank = (1 - lambda) + lambda*newRank;
-                change += Math.abs(ranks[i] - newRank);
-                ranks[i] = newRank;
                 if (G[i].weight == 0) {
-                    double pr = ranks[i] / ranks.length;
-                    ranks[i] = 0.0;
-                    pr_extra += pr;
+                    newRank = newRank / ranks.length;
+                    pr_extra += newRank;
                 }
+                change += (Math.abs(ranks[i] - newRank) > stoper) ? 1 : 0;
+                ranks[i] = newRank;
             }
-            if (change < maxChange) break;
+            System.out.print("Iter: " + iters + "   Last change: " + change + "   \r");
+            if (change == 0) break;
             pr_end = pr_extra;
         }
         System.out.println("Finished pageRank calculation after " + iters + " iterations");
@@ -176,11 +173,12 @@ public class PageRank {
     public static void outputPageRanks(Boolean sort, int limit) {
         if (sort) {
             java.util.Arrays.sort(ranks);
+
         }
         for (int i = 0; i < ranks.length && (i < limit || limit < 0); ++i) {
             System.out.print(airportNames[i].substring(0, Math.min(66, airportNames[i].length())));
             for (int j = airportNames[i].length(); j < 65; ++j) System.out.print(" ");
-            System.out.println(" " + ranks[i] + "\t" + airportCodes[i] + "\t" + G[i].weight + "G[i].list.size =" + G[i].list.size());
+            System.out.println(" " + ranks[i] + "\t" + airportCodes[i] + "\t" + G[i].weight + "\t" + G[i].list.size());
         }
     }
 
@@ -212,6 +210,10 @@ public class PageRank {
 
        HashMap<String, Double> ret = new HashMap<String, Double>();
        for (int i = 0; i < args.length; i += 2) {
+           if (args[i].toLowerCase().equals("help")) {
+               usage();
+           }
+
            Double val;
            if (args[i + 1].toLowerCase().equals("true")) {
                val = 1.0;
@@ -237,6 +239,12 @@ public class PageRank {
         readAirports();   // get airport names, codes, and assign indices
         readRoutes();     // read tuples and build graph
         computePageRanks(params.get("lambda"), params.get("precision"), params.get("maxIters").intValue());
+        System.out.println("Press ENTER to print the results...");
+        try {
+            System.in.read();
+        } catch (Exception e) {
+            System.out.println("ERROR: ");
+        }
         outputPageRanks(params.get("sort").equals(1.0), params.get("results").intValue());
 
     }
