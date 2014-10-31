@@ -15,11 +15,18 @@ public class PageRank {
         HashMap<Integer, Edge> listAux;     // Temp. structure to generate list faster
     }
 
+    static class ListOutput {
+      String airportName;
+      double rank;
+      String airportCode;
+      
+    }
+
     static String airportCodes[];           // index to short code
-    static String airportNames[];           // index to airport name
+    //static String airportNames[];           // index to airport name
     static HashMap<String,Integer> airportIndices;  // airport code to index
-    static EdgeList[] G;                    // G[i] is a list of pairs (j,k) meaning
-                                            // "there are k routes from airport j to airport i"
+    static EdgeList[] G;
+    static ListOutput[] outp;
     static double[] ranks;                  // Rank of each airport
 
     public static void readAirports() {
@@ -48,20 +55,25 @@ public class PageRank {
                 index++;
             }
         }
-
-        airportCodes = new String[index];
-        airportNames = new String[index];
+        //airportCodes = new String[index];
+        //airportNames = new String[index];
         G = new EdgeList[index];
+        outp = new ListOutput[index];
         ranks = new double[index];
 
         final double initRank = 1.0/index;
         for (int i = 0; i < index; i++) {
-             airportCodes[i] = codeTemp.get(i);
-             airportNames[i] = nameTemp.get(i);
+             outp[i] = new ListOutput();
+             outp[i].airportName = nameTemp.get(i);
+             outp[i].airportCode = codeTemp.get(i);
+             //airportCodes[i] = codeTemp.get(i);
+             //airportNames[i] = nameTemp.get(i);
+
              G[i] = new EdgeList();
              G[i].weight = 0;
              G[i].list = new ArrayList<Edge>();
              G[i].listAux = new HashMap<Integer, Edge>();
+             outp[i].rank = initRank;
              ranks[i] = initRank;
         }
          // TO DO: DUMP STUFF TO airportCodes, airportNames, airportIndices
@@ -175,19 +187,27 @@ public class PageRank {
             System.out.print("Iter: " + iters + "   Last change: " + change + "   \r");
         }
         System.out.println("Finished pageRank calculation after " + iters + " iterations");
-
+        for (int i = 0; i < ranks.length; ++i) {
+          outp[i].rank = ranks[i];
+        }
         return iters;
     }
 
     public static void outputPageRanks(Boolean sort, int limit) {
         if (sort) {
-            java.util.Arrays.sort(ranks);
+            java.util.Arrays.sort(outp, new java.util.Comparator<ListOutput>() {
+                      public int compare(ListOutput s1, ListOutput s2) {
+                          if (s1.rank < s2.rank) return -1;
+                          else if (s1.rank > s2.rank) return 1;
+                          else return 0;
+                      }
+                  });
 
         }
-        for (int i = 0; i < ranks.length && (i < limit || limit < 0); ++i) {
-            System.out.print(airportNames[i].substring(0, Math.min(66, airportNames[i].length())));
-            for (int j = airportNames[i].length(); j < 65; ++j) System.out.print(" ");
-            System.out.println(" " + ranks[i] + "\t" + airportCodes[i] + "\t" + G[i].weight + "\t" + G[i].list.size());
+        for (int i = 0; i < outp.length && (i < limit || limit < 0); ++i) {
+            System.out.print(outp[i].airportName.substring(0, Math.min(66, outp[i].airportName.length())));
+            for (int j = outp[i].airportName.length(); j < 65; ++j) System.out.print(" ");
+            System.out.println(" " + outp[i].rank + "\t" + outp[i].airportCode);
         }
     }
 
