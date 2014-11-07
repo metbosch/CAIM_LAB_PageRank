@@ -151,12 +151,21 @@ public class PageRank {
         int iters;                                    // Iterations counter
 
         System.out.println("Starting pageRank calculation");
-        System.out.print("Iters: 0\r");
+        // Compute the first round of extra PageRank
+        for (int i = 0; i < ranks.length; ++i) {
+            // If one node doesn't have outgoing edges, divide it's page rank into all nodes
+            if (G[i].weight == 0) {
+                prAnt += ranks[i]/(double)ranks.length;
+            }
+        }
+
+        System.out.print("Iter: 0\r");
         for (iters = 0; iters < maxIters; ++iters) {
-            int change = 0;                           // Counter of nodes which pageRank change between iterations
+            int change = 0;                          // Counter of nodes which pageRank change between iterations
             double prExtra = 0.0;                    // Extra pageRank to be added the next iteration
 
             // For each node
+            double totalRank = 0.0;
             for (int i = 0; i < ranks.length; ++i) {
                 ranksTmp[i] = 0.0;
 
@@ -164,8 +173,8 @@ public class PageRank {
                 for (int j = 0; j < G[i].list.size(); ++j) {
                     Edge inEdge = G[i].list.get(j);
                     // (Rank of J) * (Edges from J to I) / (Outgoing edges of J)
-                    ranksTmp[i] += ranks[inEdge.origin] * (((double)(inEdge.weight)) /
-                                                           ((double)(G[inEdge.origin].weight)));
+                    ranksTmp[i] += ranks[inEdge.origin] * ((double)(inEdge.weight)) /
+                                                          ((double)(G[inEdge.origin].weight));
                 }
                 ranksTmp[i] += prAnt;
                 ranksTmp[i] = (1.0 - lambda)/(double)ranks.length + lambda*ranksTmp[i];
@@ -173,7 +182,7 @@ public class PageRank {
 
                 // If one node doesn't have outgoing edges, divide it's page rank into all nodes
                 if (G[i].weight == 0) {
-                    prExtra = ranksTmp[i]/(double)ranks.length;
+                    prExtra += ranksTmp[i]/(double)ranks.length;
                 }
             }
             prAnt = prExtra;
@@ -182,9 +191,8 @@ public class PageRank {
             double[] pointer = ranks;
             ranks = ranksTmp;
             ranksTmp = pointer;
-
             if (change == 0) break;
-            System.out.print("Iter: " + iters + "   Last change: " + change + "   \r");
+            System.out.print("Iter: " + iters + "   Not converged nodes: " + change + "   \r");
         }
         System.out.println("Finished pageRank calculation after " + iters + " iterations");
         for (int i = 0; i < ranks.length; ++i) {
