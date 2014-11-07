@@ -19,6 +19,8 @@ public class PageRank {
       String airportName;
       double rank;
       String airportCode;
+      int outgoing;
+      int comeing;
       
     }
 
@@ -68,6 +70,8 @@ public class PageRank {
              outp[i].airportCode = codeTemp.get(i);
              //airportCodes[i] = codeTemp.get(i);
              //airportNames[i] = nameTemp.get(i);
+             outp[i].outgoing = 0;
+             outp[i].comeing = 0;
 
              G[i] = new EdgeList();
              G[i].weight = 0;
@@ -108,7 +112,9 @@ public class PageRank {
             else ++index;
 
             G[fromAirport].weight++;
+            outp[fromAirport].outgoing++;
             Edge tmp = G[toAirport].listAux.get(fromAirport);
+            outp[toAirport].comeing++;
             if (tmp == null) {
                 tmp = new Edge();
                 tmp.origin = fromAirport;
@@ -215,7 +221,7 @@ public class PageRank {
         for (int i = 0; i < outp.length && (i < limit || limit < 0); ++i) {
             System.out.print(outp[i].airportName.substring(0, Math.min(66, outp[i].airportName.length())));
             for (int j = outp[i].airportName.length(); j < 65; ++j) System.out.print(" ");
-            System.out.println(" " + outp[i].rank + "\t" + outp[i].airportCode);
+            System.out.println(" " + outp[i].rank + "\t" + outp[i].airportCode + "\t Out: "+ outp[i].outgoing + "\t In: "+ outp[i].comeing);
         }
     }
 
